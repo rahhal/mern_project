@@ -1,0 +1,40 @@
+const isEmpty = require('./isEmpty');
+const validator = require("validator");
+
+module.exports = function validateProfile(data){
+        let errors = {};
+        username = !isEmpty(data.username) ? data.username : "";
+        country = !isEmpty(data.country) ? data.country : "";
+        skills = !isEmpty(data.skills) ? data.skills : "";
+
+        if(validator.isEmpty(username)){
+            errors.username = "required username";
+        }
+        if(validator.isEmpty(country))
+        {
+            errors.country="required country";}
+            
+        if(validator.isEmpty(skills)){
+            errors.skills="required skills";
+        }
+        if(!isEmpty(data.linkedIn))
+        {
+            if(!validator.isURL(data.linkedIn))
+            {errors.linkedIn= "this is not valid url linkedIn";
+            }
+        }
+        if(!isEmpty(data.github))
+        {
+            if(!validator.isURL(data.github)) {
+                errors.github= "this is not valid url github";
+            }
+        }
+         if (!validator.isLength(data.username, { min: 5, max: 20 })) {
+            errors.username = " username length must be between 5 and 20 caracters";
+        }
+
+        return{
+            isValid: isEmpty(errors),
+            errors,
+        };
+};

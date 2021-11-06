@@ -3,7 +3,7 @@ var bcrypt = require("bcryptjs");
 const validateRegistration = require("../utiles/registration");
 const validateLogin = require("../utiles/login");
 const jwt = require("jsonwebtoken");
-
+const gravatar = require("gravatar");
 
 const addUser = async (req, res) => {
   const { isValid, errors } = validateRegistration(req.body);
@@ -17,6 +17,12 @@ const addUser = async (req, res) => {
         const user = new Users(req.body);
         var hash = bcrypt.hashSync(user.password, 8);
         user.password = hash;
+        user.avatar = gravatar.url(req.body.email);
+        // user.avatar = gravatar.url(
+        //   req.body.email,
+        //   { s: "100", r: "x", d: "retro" },
+        //   true
+        // );
         user
           .save()
           .then(() => res.json({ message: "user added with success" }))
@@ -51,7 +57,7 @@ const loginUser = async(req,res) =>{
                  id: user.id,
                  email: user.email
              };
-             jwt.sign( payload, process.env.SECRET, {expiresIn: 60 }, (err, token)=>{
+             jwt.sign( payload, process.env.SECRET, {expiresIn: 3600 }, (err, token)=>{
                 res.json({
                     success: true,
                     token: token,
