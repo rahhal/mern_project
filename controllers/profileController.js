@@ -4,6 +4,10 @@
 const profiles = require('../models/profile');
 const validateProfile = require('../utiles/profile');
 const users = require('../models/user');
+const validateExperience = require('../utiles/experience');
+const validateEducation = require('../utiles/education');
+const StatusCodes = require('http-status-codes');
+
 
 const addProfile = async(req, res)=>{
     const {isValid, errors} = validateProfile (req.body);
@@ -132,12 +136,92 @@ const getProfile = (req, res) => {
       );
     });
   };
+  const addExperience = (req, res) => {
+    const { errors, isValid } = validateExperience(req.body);
+    if (!isValid) {
+      res.status(StatusCodes.BAD_REQUEST).json(errors);
+    } else {
+      profiles.findOne({ user: req.user.id }).then((profile) => {
+        const experience = {
+          title: req.body.title,
+          company: req.body.company,
+          location: req.body.location,
+          from: req.body.from,
+          to: req.body.to,
+          description: req.body.description,
+        };
+        profile.experience.unshift(experience);
+        profile.save().then((result) => res.json(result));
+      });
+    }
+  
+  };
+  const addEducation = (req, res) => {
+    const { errors, isValid } = validateEducation(req.body);
+    if (!isValid) {
+      res.status(StatusCodes.BAD_REQUEST).json(errors);
+    } else {
+      Profiles.findOne({ user: req.user.id }).then((profile) => {
+        const education = {
+          school: req.body.school,
+          from: req.body.from,
+          to: req.body.to,
+          description: req.body.description,
+        };
+        profile.education.unshift(education);
+        profile.save().then((result) => res.json(result));
+      });
+    }
+  
+  };
+  const deleteExperience = (req, res) => {
+    let errors = {};
+    profiles.findOne({ user: req.user.id })
+      .then((profile) => {
+        const indexExperience = profile.experience
+          .map((item) => item.id)
+          .indexOf(req.params.id);
+        if (indexExperience > -1) {
+          profile.experience.splice(indexExperience, 1);
+          profile.save().then((result) => res.status(StatusCodes.OK).json(result));
+        } else {
+          errors.message = "no experiences found";
+          return res.status(StatusCodes.NOT_FOUND).json(errors);
+        }
+      })
+      .catch((err) => {
+        res.status(StatusCodes.NOT_FOUND).json(err);
+      });
+  };
+  const deleteEducation = (req, res) => {
+    let errors = {};
+    profiles.findOne({ user: req.user.id })
+      .then((profile) => {
+        const indexEducation = profile.education
+          .map((item) => item.id)
+          .indexOf(req.params.id);
+        if (indexEducation > -1) {
+          profile.education.splice(indexEducation, 1);
+          profile.save().then((result) => res.status(StatusCodes.OK).json(result));
+        } else {
+          errors.message = "no educations found";
+          return res.status(StatusCodes.NOT_FOUND).json(errors);
+        }
+      })
+      .catch((err) => {
+        res.status(StatusCodes.NOT_FOUND).json(err);
+      });
+  };
   
 module.exports = {
     addProfile, 
     getProfile,
     getUsername,
     getAllProfile,
-    DeleteProfile
+    DeleteProfile,
+    addExperience,
+    addEducation,
+    deleteExperience,
+    deleteEducation
 
 };

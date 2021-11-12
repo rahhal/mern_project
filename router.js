@@ -31,11 +31,33 @@ Router.get('/profile',
 Router.get("/all", profileController.getAllProfile);
 
 /* delete profile and user */
-Router.delete(
-            "/profile",
+Router.delete( "/profile",
             passport.authenticate("jwt", { session: false }),
             profileController.DeleteProfile
           );
+          /* ajout d'experience */
+Router.post("/experience",
+          passport.authenticate("jwt", { session: false }),
+          profileController.addExperience
+        );
+/* Ajout d'education */
+Router.post("/education",
+          passport.authenticate("jwt", { session: false }),
+          profileController.addEducation
+        );
+/* delete experience */
+
+Router.delete("/experience/:id",
+        passport.authenticate("jwt", { session: false }),
+        profileController.deleteExperience
+      );
+/* delete education */
+
+Router.delete("/education/:id",
+        passport.authenticate("jwt", { session: false }),
+        profileController.deleteEducation
+      );
+
 
 
 module.exports= Router;
